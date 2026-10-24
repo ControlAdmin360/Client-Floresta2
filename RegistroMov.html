@@ -105,11 +105,6 @@
         💡 SERVICIOS
         <select id="presetSelect" style="margin-top:4px;padding:9px 10px;font-size:.95rem;border:1px solid var(--color-border);border-radius:var(--radius-s);color:rgba(0,0,0,0.5);width:50%;">
           <option value="">-- Selecciona el Servicio --</option>
-          <option value="LUZ-BCI">LUZ-BCI</option>
-          <option value="LUZ-SG">LUZ-SG</option>
-          <option value="ADMIN">ADMIN</option>
-          <option value="SEDAPAL">SEDAPAL</option>
-          <option value="ANDINOS">ANDINOS</option>
         </select>
       </label>
 
@@ -251,10 +246,20 @@
     initIDBlock();
     validarMensajeInicial();
 
+    function poblarSelectServicios() {
+      if (!presetSelect) return;
+      while (presetSelect.options.length > 1) presetSelect.remove(1);
+      listaServs
+        .map(s => String(s).trim().toUpperCase())
+        .filter(s => s && !s.startsWith('M3'))
+        .forEach(s => presetSelect.add(new Option(s, s)));
+    }
+
     if (p && p.LISTAS && p.LISTAS.depaIds?.length && p.LISTAS.servIds?.length) {
       // 1. Si ya existen en memoria, las toma al instante
       listaDepas = p.LISTAS.depaIds;
       listaServs = p.LISTAS.servIds;
+      poblarSelectServicios();
       updateTipoMovimiento();
     } else if (p && typeof p.netRun === 'function') {
       // 2. Si no están, las pide directo a Apps Script
@@ -265,6 +270,7 @@
         
         // Guarda en memoria para no volver a pedir
         p.LISTAS = { depaIds: listaDepas, servIds: listaServs };
+        poblarSelectServicios();
         updateTipoMovimiento();
       }).getListasIdBanco();
     }
