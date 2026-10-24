@@ -526,7 +526,7 @@ document.getElementById('btn-m3')?.addEventListener('click', async () => {
 
     if (typeof uiPaintCell === 'function') {
       uiPaintCell({
-        row: 9 - 3, col: 16, text: formatted,
+        row: bancoFilaM3() || 6, col: 16, text: formatted,
         color: '#333333', bg: '#AAAAAA', align: 'center', radius: 8
       });
     }
@@ -1222,15 +1222,7 @@ function banco_renderStyled(payload) {
     tbl.innerHTML = (typeof buildColGroup === 'function' ? buildColGroup(generatedWidths) : '') + headHtml + bodyHtml;
 
     // ===== 5. INTERACTIVIDAD Y KPIS =====
-    if (typeof uiPaintCell === 'function') {
-      uiPaintCell({ row: 1, col: 15, color: '#995924', align: 'center' });
-      uiPaintCell({ row: 2, col: 15, color: '#D36FC1', align: 'center' });
-      uiPaintCell({ row: 3, col: 15, color: '#688E87', align: 'center' });
-      uiPaintCell({ row: 4, col: 15, color: '#F4BE3F', align: 'center' });
-      uiPaintCell({ row: 5, col: 15, color: '#4258FF', align: 'center' });
-      uiPaintCell({ row: 6, col: 16, color: '#333333', bg: '#AAAAAA', align: 'center', radius: 8 });
-      uiPaintCell({ row: 8, col: 15, color: '#989D9C', bg: '#970C1D', align: 'center', radius: 8 });
-    }
+    pintarPanelServiciosBanco();
 
     const kMov = document.getElementById('banco-kpi-mov');
     const kMon = document.getElementById('banco-kpi-monto');
@@ -1278,6 +1270,47 @@ function setupBanco(){
 }
 
 // --- Helpers de columnas visibles (respetan colSpan) ---
+const BANCO_COLOR_SERVICIO = {
+  'ADMIN': '#995924', 'ANDINOS': '#D36FC1', 'LUZ-BCI': '#688E87', 'LUZ-SG': '#F4BE3F',
+  'LUZ1': '#688E87', 'LUZ2': '#F4BE3F', 'SEDAPAL': '#4258FF',
+  'PISCINAS': '#2EC4D6', 'JARDINES': '#5FAF4A'
+};
+
+function bancoNombreServicioFila(tr) {
+  const td = tr ? _getCellByVisIndex(tr, 15) : null;
+  return String(td?.textContent || '').trim().toUpperCase();
+}
+
+function bancoFilaM3() {
+  const body = document.getElementById('tabla-banco')?.tBodies?.[0];
+  if (!body) return 0;
+  for (let r = 1; r <= body.rows.length; r++) {
+    const nombre = bancoNombreServicioFila(body.rows[r - 1]);
+    if (nombre === 'FALTA:') return 0;
+    if (nombre.startsWith('M3')) return r;
+  }
+  return 0;
+}
+
+function pintarPanelServiciosBanco() {
+  if (typeof uiPaintCell !== 'function') return;
+  const body = document.getElementById('tabla-banco')?.tBodies?.[0];
+  if (!body) return;
+  for (let r = 1; r <= body.rows.length; r++) {
+    const nombre = bancoNombreServicioFila(body.rows[r - 1]);
+    if (!nombre) continue;
+    if (nombre === 'FALTA:') {
+      uiPaintCell({ row: r, col: 15, color: '#989D9C', bg: '#970C1D', align: 'center', radius: 8 });
+      break;
+    }
+    if (nombre.startsWith('M3')) {
+      uiPaintCell({ row: r, col: 16, color: '#333333', bg: '#AAAAAA', align: 'center', radius: 8 });
+    } else {
+      uiPaintCell({ row: r, col: 15, color: BANCO_COLOR_SERVICIO[nombre] || '#CBD5E1', align: 'center' });
+    }
+  }
+}
+
 function _getCellByVisIndex(tr, visCol1){
   let acc = 0;
   for (const td of tr.cells){
