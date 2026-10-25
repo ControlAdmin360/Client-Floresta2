@@ -298,8 +298,14 @@ window.netRun = function () {
               parameters: args
             })
           })
-          .then(res => {
-            if (!res.ok) throw new Error("HTTP error " + res.status);
+          .then(async res => {
+            if (!res.ok) {
+              // Si el servidor dice que la sesión ya no vale (ej. tras restaurar la base), se cierra la sesión.
+              const cuerpo = await res.json().catch(() => null);
+              const msg = (cuerpo && cuerpo.message) || '';
+              if (/Sesión inválida o expirada/.test(msg)) cerrarSesion(true);
+              throw new Error(msg || "HTTP error " + res.status);
+            }
             return res.json();
           })
           .then(res => {
