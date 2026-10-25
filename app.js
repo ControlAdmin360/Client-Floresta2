@@ -305,9 +305,9 @@ window.netRun = function () {
 };
 
 // ===== Datos del condominio (CONFIG/COMPANY) =====
-// Los textos del HTML ya traen los de Gaviotas 160 como respaldo; si la llamada
-// al backend falla no se cambia nada.
-window.COMPANY = { NOMBRE: 'Las Gaviotas 160', NOMBRE_CORTO: 'Gaviotas 160', ICONO: '\u{1F54A}️' };
+// El frontend no guarda datos de ningún condominio: si no se pueden leer de
+// Firebase se muestra UNKNOWN. Los textos quedan ocultos hasta saber cuáles son.
+window.COMPANY = { NOMBRE: 'UNKNOWN', NOMBRE_CORTO: 'UNKNOWN', ICONO: '' };
 
 function tituloApp(n) { return `${window.COMPANY.NOMBRE_CORTO} (${n})`; }
 
@@ -333,14 +333,26 @@ function aplicarCompany(info) {
 }
 
 function iniCompany() {
-  try { aplicarCompany(JSON.parse(localStorage.getItem('COMPANY_INFO') || 'null')); } catch (e) {}
+  const revelar = () => document.documentElement.classList.add('company-listo');
+  const desconocido = () => { if (window.COMPANY.NOMBRE_CORTO === 'UNKNOWN') aplicarCompany({ NOMBRE: 'UNKNOWN', NOMBRE_CORTO: 'UNKNOWN', ICONO: '' }); };
+  let conCache = false;
+  try {
+    const c = JSON.parse(localStorage.getItem('COMPANY_INFO') || 'null');
+    if (c && c.NOMBRE_CORTO) { aplicarCompany(c); conCache = true; }
+  } catch (e) {}
+  if (conCache) revelar();
+  setTimeout(() => { desconocido(); revelar(); }, 5000);
   netRun()
     .withSuccessHandler(res => {
-      if (!res || !res.ok) return;
-      aplicarCompany(res);
-      try { localStorage.setItem('COMPANY_INFO', JSON.stringify({ NOMBRE: res.NOMBRE, NOMBRE_CORTO: res.NOMBRE_CORTO, ICONO: res.ICONO })); } catch (e) {}
+      if (res && res.ok) {
+        aplicarCompany(res);
+        try { localStorage.setItem('COMPANY_INFO', JSON.stringify({ NOMBRE: res.NOMBRE, NOMBRE_CORTO: res.NOMBRE_CORTO, ICONO: res.ICONO })); } catch (e) {}
+      } else {
+        desconocido();
+      }
+      revelar();
     })
-    .withFailureHandler(() => {})
+    .withFailureHandler(() => { desconocido(); revelar(); })
     .getCompanyInfo();
 }
 iniCompany();
