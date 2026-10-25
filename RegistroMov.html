@@ -120,7 +120,7 @@
           <span id="metaFecha"><strong>Fecha actual:</strong> —</span>
           <span id="metaUsuario"><strong>User:</strong> —</span>
         </div>
-        <div class="id-hint">Administración Las Gaviotas 160.</div>
+        <div class="id-hint" id="idHintAdmin">Administración Las Gaviotas 160.</div>
       </div>
 
       <div class="actions">
@@ -244,6 +244,11 @@
       renderMetaUsuario();
     }
     initIDBlock();
+    try {
+      const nombreCondo = window.parent && window.parent.COMPANY && window.parent.COMPANY.NOMBRE;
+      const hint = document.getElementById('idHintAdmin');
+      if (nombreCondo && hint) hint.textContent = 'Administración ' + nombreCondo + '.';
+    } catch (e) {}
     validarMensajeInicial();
 
     function poblarSelectServicios() {
