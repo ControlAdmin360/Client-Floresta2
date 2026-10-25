@@ -58,6 +58,24 @@ function verificarModoMantenimiento() {
     .api_obtenerModoMantenimiento();
 }
 
+// Cada 60 s: si hay sesión iniciada y el modo mantenimiento está activo, cierra la sesión.
+// La entrada de administración (?admin=1) no se vigila, porque es la que se usa durante el mantenimiento.
+function vigilarMantenimiento() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('admin') === '1' || params.get('mode') === 'admin') return;
+  setInterval(() => {
+    if (!getAuthToken()) return;
+    fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ functionName: 'api_obtenerModoMantenimiento', parameters: [] })
+    })
+      .then(r => r.json())
+      .then(r => { if (r?.result?.mantenimiento === true && getAuthToken()) cerrarSesion(true); })
+      .catch(() => {});
+  }, 60000);
+}
+
 // --- Gestión de Sesión y Token (sessionStorage) ---
 function getAuthToken(){ return sessionStorage.getItem('AUTH_TOKEN') || ''; }
 function setAuthToken(t){ if (t) sessionStorage.setItem('AUTH_TOKEN', t); }
@@ -4644,6 +4662,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 3. Modales y Vistas Iniciales
   verificarModoMantenimiento(); // Pública: no requiere sesión, se puede mostrar siempre
+  vigilarMantenimiento();
   setupFullscreen();
   setupMobileSidebar();
   setupSearch();
