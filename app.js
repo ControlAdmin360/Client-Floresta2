@@ -220,7 +220,7 @@ function iniServicesDepas() {
 
       // 2. Actualiza el título de la pestaña del navegador inmediatamente
       if (depas.length > 0) {
-        document.title = `Gaviotas 160 (${depas.length})`;
+        document.title = tituloApp(depas.length);
       }
 
       // 3. Hidrata los Sets para que DataBank pinte colores al instante
@@ -303,6 +303,47 @@ window.netRun = function () {
   });
   return proxy;
 };
+
+// ===== Datos del condominio (CONFIG/COMPANY) =====
+// Los textos del HTML ya traen los de Gaviotas 160 como respaldo; si la llamada
+// al backend falla no se cambia nada.
+window.COMPANY = { NOMBRE: 'Las Gaviotas 160', NOMBRE_CORTO: 'Gaviotas 160', ICONO: '\u{1F54A}️' };
+
+function tituloApp(n) { return `${window.COMPANY.NOMBRE_CORTO} (${n})`; }
+
+function aplicarCompany(info) {
+  if (!info || !info.NOMBRE_CORTO) return;
+  window.COMPANY = { NOMBRE: info.NOMBRE || info.NOMBRE_CORTO, NOMBRE_CORTO: info.NOMBRE_CORTO, ICONO: info.ICONO || '' };
+  const corto = window.COMPANY.NOMBRE_CORTO, icono = window.COMPANY.ICONO;
+  const poner = (sel, txt) => document.querySelectorAll(sel).forEach(el => { el.textContent = txt; });
+  poner('[data-company="icono"]', icono);
+  poner('[data-company="corto"]', corto);
+  poner('[data-company="marca"]', `${icono} ${corto}`.trim());
+  poner('[data-company="modulo"]', `Contometros / ${corto}`);
+  poner('[data-company="titulo-banco"]', `\u{1F310} AppWeb! ${corto}`);
+  const m = document.title.match(/\(([^)]*)\)\s*$/);
+  document.title = tituloApp(m ? m[1] : '-');
+  const meta = document.getElementById('meta-apple-title');
+  if (meta) meta.setAttribute('content', corto);
+  const fav = document.getElementById('favicon-main');
+  if (fav && icono) {
+    const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><text y='1em' font-size='96'>" + icono + "</text></svg>";
+    fav.href = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+}
+
+function iniCompany() {
+  try { aplicarCompany(JSON.parse(localStorage.getItem('COMPANY_INFO') || 'null')); } catch (e) {}
+  netRun()
+    .withSuccessHandler(res => {
+      if (!res || !res.ok) return;
+      aplicarCompany(res);
+      try { localStorage.setItem('COMPANY_INFO', JSON.stringify({ NOMBRE: res.NOMBRE, NOMBRE_CORTO: res.NOMBRE_CORTO, ICONO: res.ICONO })); } catch (e) {}
+    })
+    .withFailureHandler(() => {})
+    .getCompanyInfo();
+}
+iniCompany();
 
 window.eventosCache = [];
 window.norm = window.norm || (s => String(s ?? '').trim().toUpperCase());
@@ -1875,7 +1916,7 @@ function setupConsultasSelect() {
       const servs = res?.servIds || [];
 
       if (depas.length > 0) {
-        document.title = `Gaviotas 160 (${depas.length})`;
+        document.title = tituloApp(depas.length);
       }
 
       window.LISTAS = window.LISTAS || {};
