@@ -329,9 +329,20 @@ window.COMPANY = { NOMBRE: 'UNKNOWN', NOMBRE_CORTO: 'UNKNOWN', ICONO: '' };
 
 function tituloApp(n) { return `${window.COMPANY.NOMBRE_CORTO} (${n})`; }
 
+// Botón "Recibos Consolidados": abre la carpeta de Drive configurada en CONFIG/COMPANY/CARPETA_RECIBOS_URL.
+function abrirCarpetaRecibos() {
+  const url = String(window.COMPANY.CARPETA_RECIBOS_URL || '').trim();
+  if (/^https:\/\//i.test(url)) {
+    window.open(url, '_blank', 'noopener');
+  } else {
+    const aviso = '⚠️ Falta configurar la carpeta de recibos (CONFIG/COMPANY/CARPETA_RECIBOS_URL en Firebase).';
+    if (window.toast) toast(aviso); else alert(aviso);
+  }
+}
+
 function aplicarCompany(info) {
   if (!info || !info.NOMBRE_CORTO) return;
-  window.COMPANY = { NOMBRE: info.NOMBRE || info.NOMBRE_CORTO, NOMBRE_CORTO: info.NOMBRE_CORTO, ICONO: info.ICONO || '' };
+  window.COMPANY = { NOMBRE: info.NOMBRE || info.NOMBRE_CORTO, NOMBRE_CORTO: info.NOMBRE_CORTO, ICONO: info.ICONO || '', CARPETA_RECIBOS_URL: info.CARPETA_RECIBOS_URL || '' };
   const corto = window.COMPANY.NOMBRE_CORTO, icono = window.COMPANY.ICONO;
   const poner = (sel, txt) => document.querySelectorAll(sel).forEach(el => { el.textContent = txt; });
   poner('[data-company="icono"]', icono);
@@ -364,7 +375,7 @@ function iniCompany() {
     .withSuccessHandler(res => {
       if (res && res.ok) {
         aplicarCompany(res);
-        try { localStorage.setItem('COMPANY_INFO', JSON.stringify({ NOMBRE: res.NOMBRE, NOMBRE_CORTO: res.NOMBRE_CORTO, ICONO: res.ICONO })); } catch (e) {}
+        try { localStorage.setItem('COMPANY_INFO', JSON.stringify({ NOMBRE: res.NOMBRE, NOMBRE_CORTO: res.NOMBRE_CORTO, ICONO: res.ICONO, CARPETA_RECIBOS_URL: res.CARPETA_RECIBOS_URL })); } catch (e) {}
       } else {
         desconocido();
       }
