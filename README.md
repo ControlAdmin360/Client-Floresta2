@@ -1,6 +1,6 @@
-# Gaviotas 160
+# Floresta II
 
-Panel de administración web (PWA) para el edificio **Gaviotas 160**: control de deudas, contómetros (medidores), registro de movimientos, generación de recibos y consolidación de períodos.
+Panel de administración web (PWA) para el condominio **Floresta II**: control de deudas, contómetros (medidores), registro de movimientos, generación de recibos y consolidación de períodos.
 
 ## Estructura del proyecto
 
@@ -22,10 +22,8 @@ No hay build ni dependencias de Node: es HTML/CSS/JS plano, servido directo.
 La app consume un backend RPC vía `fetch` (constante `GAS_API_URL` en `app.js`):
 
 ```
-https://backend-zeta-coral-88.vercel.app/api/rpc
+https://backend-floresta2.vercel.app/api/rpc
 ```
-
-Anteriormente el backend era un Google Apps Script (URL comentada en `app.js` como referencia/fallback).
 
 ## Autenticación
 

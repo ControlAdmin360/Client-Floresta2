@@ -1,7 +1,7 @@
 // Service worker mínimo: solo habilita la instalación como app y da un
 // respaldo offline para el "cascarón" estático. Los datos (RPC al backend)
 // SIEMPRE van a la red — nunca se cachean, para no mostrar cifras viejas.
-const CACHE_NAME = 'gaviotas160-shell-v2';
+const CACHE_NAME = 'floresta2-shell-v1';
 const SHELL_FILES = [
   './index.html',
   './CSS.css',

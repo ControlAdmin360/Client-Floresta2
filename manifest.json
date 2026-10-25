@@ -1,7 +1,7 @@
 {
-  "name": "Gaviotas 160",
-  "short_name": "Gaviotas 160",
-  "description": "Panel de administración — Gaviotas 160",
+  "name": "Floresta II",
+  "short_name": "Floresta II",
+  "description": "Panel de administración — Floresta II",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

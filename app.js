@@ -256,8 +256,7 @@ function iniServicesDepas() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //  SWICHT URL PARA CONEXION publica de tu Web App en: GAS / VERCEL 'COEXION AL BACKEND'
-const GAS_API_URL = "https://backend-zeta-coral-88.vercel.app/api/rpc";
-//const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzFqp2a1_zQPrw_1syxd9yl_nSHhiUN7f00LqxQSZzclgp1CzOrm2Vrijv31RP2dO_yew/exec";
+const GAS_API_URL = "https://backend-floresta2.vercel.app/api/rpc";
 
 // --- Motor Principal netRun (Conexión Directa e Híbrida a Apps Script) ---
 window.netRun = function () {
