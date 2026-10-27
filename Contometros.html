@@ -255,7 +255,10 @@
         show(btnGuardar, true, 'inline-block'); enable(btnGuardar, true);
       } else {
         show(btnGuardarFecha, true, 'inline-block');
-        show(btnVerLecturas, true, 'inline-block');
+        // "Cargar Fecha" solo tiene sentido si hay al menos una fecha previa
+        // para elegir en el combo -- sin eso (primer ciclo, 0/0 lecturas) no
+        // hay nada que cargar.
+        show(btnVerLecturas, fechasSrc.length > 0, 'inline-block');
         show(btnToggleLect,  false);
         const inpFecha = $('inpFechaNueva'); if (inpFecha) inpFecha.value = '';
         clearSelectionUI();
