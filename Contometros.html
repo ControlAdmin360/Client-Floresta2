@@ -722,11 +722,25 @@
   // Validación de lectura en tiempo real
   $('inpValor')?.addEventListener('input', function(){
     const msg = $('msg'), btn = $('btnGuardar'), s = this.value.trim();
-    if (s === '' || isNaN(s) || prevDeSeleccionado == null) {
-      this.style.borderColor = ''; 
-      msg.textContent = ''; 
-      this.classList.remove('input-error'); 
-      if (btn) btn.disabled = true; 
+    if (s === '' || isNaN(s)) {
+      this.style.borderColor = '';
+      msg.textContent = '';
+      this.classList.remove('input-error');
+      if (btn) btn.disabled = true;
+      return;
+    }
+
+    // Sin lectura previa (primera lectura del ciclo para esta unidad): no hay
+    // nada contra qué comparar, así que cualquier número válido se acepta
+    // directo -- antes esto dejaba el botón Guardar deshabilitado para
+    // siempre, impidiendo cargar la Lectura Inicial.
+    if (prevDeSeleccionado == null) {
+      this.style.borderColor = '';
+      this.classList.remove('input-error');
+      msg.classList.remove('warn');
+      msg.classList.add('flat');
+      text(msg, '');
+      if (btn) btn.disabled = false;
       return;
     }
 
